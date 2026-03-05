@@ -4,7 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ivan Apolinar</title>
+    <title>Tarjeta de Presentación | Ivan Apolinar</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <meta property="og:title" content="Tarjeta de Presentación | Ivan Apolinar">
+    <meta property="og:description" content="Escanea mi tarjeta digital y guarda mi contacto.">
+    <meta property="og:image" content="logo.png">
+    <meta property="og:type" content="website">
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=TU_ID_AQUI"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'TU_ID_AQUI');
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/framer-motion@10/dist/framer-motion.js"></script>
     <style>
@@ -210,10 +223,71 @@
             background-size: 400% 400%;
             animation: gradient-shift 15s ease infinite;
         }
+        /* Animación de entrada suave */
+        @keyframes fadeInPage {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-loading {
+            opacity: 0;
+        }
+
+        .page-loaded {
+            animation: fadeInPage 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        /* Botón Guardar Contacto */
+        .save-contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #ff0080, #8000ff);
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-radius: 9999px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 10px 40px rgba(255, 0, 128, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .save-contact-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 50px rgba(255, 0, 128, 0.6);
+        }
+
+        .save-contact-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.15), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
     </style>
 </head>
 
-<body class="bg-black text-white">
+<body class="bg-black text-white page-loading">
     <div class="relative w-full min-h-screen overflow-hidden">
         <!-- Fondo animado -->
         <div class="fixed inset-0 overflow-hidden z-0">
@@ -1017,6 +1091,11 @@
                             <div class="glass-card rounded-2xl p-6 reveal-base reveal-left" style="animation-delay: ${Math.random() * 2}s">
                                 <h3 class="text-2xl font-bold text-white mb-6">Información de Contacto</h3>
                                 <div class="space-y-4">${contactInfos}</div>
+                                <div class="mt-8 text-center">
+                                    <a href="contacto.vcf" download="contacto.vcf" class="save-contact-btn" id="btn-guardar-contacto">
+                                        💾 Guardar Contacto
+                                    </a>
+                                </div>
                             </div>
                             <div class="glass-card rounded-2xl p-6 reveal-base reveal-right" style="transition-delay: 200ms; animation-delay: ${Math.random() * 2}s">
                                 <h3 class="text-2xl font-bold text-white mb-6">Pasatiempos</h3>
@@ -1086,6 +1165,69 @@
 
         // Ejecutar el nuevo renderizado inmediatamente
         renderContent();
+
+        // --- ANIMACIÓN DE ENTRADA SUAVE ---
+        window.addEventListener('DOMContentLoaded', () => {
+            document.body.classList.remove('page-loading');
+            document.body.classList.add('page-loaded');
+        });
+        // Fallback si DOMContentLoaded ya pasó
+        if (document.readyState !== 'loading') {
+            document.body.classList.remove('page-loading');
+            document.body.classList.add('page-loaded');
+        }
+
+        // --- SISTEMA DE ESTADÍSTICAS DE VISITAS ---
+        (function() {
+            // Detectar fuente de la visita por parámetro URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const source = urlParams.get('source') || 'web'; // 'qr', 'nfc', o 'web'
+
+            // Claves en localStorage
+            const STATS_KEY = 'visitStats';
+
+            // Obtener estadísticas actuales
+            function getStats() {
+                try {
+                    return JSON.parse(localStorage.getItem(STATS_KEY)) || { web: 0, qr: 0, nfc: 0, total: 0 };
+                } catch(e) {
+                    return { web: 0, qr: 0, nfc: 0, total: 0 };
+                }
+            }
+
+            // Registrar visita
+            const stats = getStats();
+            if (source === 'qr' || source === 'nfc' || source === 'web') {
+                stats[source] = (stats[source] || 0) + 1;
+            } else {
+                stats.web = (stats.web || 0) + 1;
+            }
+            stats.total = (stats.total || 0) + 1;
+            localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+
+            // Enviar evento a Google Analytics (cuando se configure el ID)
+            if (typeof gtag === 'function') {
+                gtag('event', 'page_visit', {
+                    'visit_source': source,
+                    'event_category': 'tarjeta_digital',
+                    'event_label': 'Visita desde ' + source.toUpperCase()
+                });
+            }
+
+            // Función global para consultar estadísticas desde la consola
+            window.getVisitStats = function() {
+                const currentStats = getStats();
+                console.log('📊 Estadísticas de Visitas:');
+                console.log('   🌐 Web directa:', currentStats.web);
+                console.log('   📱 Código QR:', currentStats.qr);
+                console.log('   📡 NFC:', currentStats.nfc);
+                console.log('   📈 Total:', currentStats.total);
+                return currentStats;
+            };
+
+            console.log('✅ Sistema de estadísticas activo. Fuente detectada:', source.toUpperCase());
+            console.log('💡 Escribe getVisitStats() en la consola para ver las estadísticas.');
+        })();
     </script>
 </body>
 
