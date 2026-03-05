@@ -14,7 +14,7 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=TU_ID_AQUI"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
         gtag('config', 'TU_ID_AQUI');
     </script>
@@ -223,12 +223,14 @@
             background-size: 400% 400%;
             animation: gradient-shift 15s ease infinite;
         }
+
         /* Animación de entrada suave */
         @keyframes fadeInPage {
             from {
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -275,19 +277,42 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.15), transparent);
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.15), transparent);
             transform: rotate(45deg);
             animation: shimmer 3s infinite;
         }
 
         @keyframes shimmer {
-            0% { transform: translateX(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) rotate(45deg); }
+            0% {
+                transform: translateX(-100%) rotate(45deg);
+            }
+
+            100% {
+                transform: translateX(100%) rotate(45deg);
+            }
         }
     </style>
 </head>
 
 <body class="bg-black text-white page-loading">
+    <!-- Pantalla de carga (Logo y Barra) -->
+    <div id="preloader"
+        class="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="w-40 h-40 mb-10 animate-pulse relative">
+            <div
+                class="absolute inset-0 bg-gradient-to-r from-pink-500 to-cyan-500 rounded-full blur-xl opacity-30 animate-pulse">
+            </div>
+            <img src="logo.png" alt="Logo Ivan Apolinar" class="w-full h-full object-contain relative z-10">
+        </div>
+        <div class="w-64 h-2 bg-gray-800 rounded-full overflow-hidden shadow-[0_0_15px_rgba(255,0,128,0.3)]">
+            <div id="preloader-bar"
+                class="h-full bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 w-0 transition-all duration-200">
+            </div>
+        </div>
+        <div id="preloader-text"
+            class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-cyan-500 text-sm mt-6 font-mono tracking-widest font-bold">
+            CARGANDO 0%</div>
+    </div>
     <div class="relative w-full min-h-screen overflow-hidden">
         <!-- Fondo animado -->
         <div class="fixed inset-0 overflow-hidden z-0">
@@ -1166,19 +1191,41 @@
         // Ejecutar el nuevo renderizado inmediatamente
         renderContent();
 
-        // --- ANIMACIÓN DE ENTRADA SUAVE ---
-        window.addEventListener('DOMContentLoaded', () => {
-            document.body.classList.remove('page-loading');
-            document.body.classList.add('page-loaded');
-        });
-        // Fallback si DOMContentLoaded ya pasó
-        if (document.readyState !== 'loading') {
-            document.body.classList.remove('page-loading');
-            document.body.classList.add('page-loaded');
+        // --- ANIMACIÓN DE ENTRADA CON LOGO Y BARRA ---
+        document.body.style.overflow = 'hidden'; // Prevenir scroll mientras carga
+        let loadProgress = 0;
+        const preloaderBar = document.getElementById('preloader-bar');
+        const preloaderText = document.getElementById('preloader-text');
+        const preloader = document.getElementById('preloader');
+
+        const loadingInterval = setInterval(() => {
+            // Simulamos avance hasta 100%
+            loadProgress += Math.floor(Math.random() * 15) + 5;
+            if (loadProgress >= 100) {
+                loadProgress = 100;
+                clearInterval(loadingInterval);
+                finishLoading();
+            }
+            if (preloaderBar) preloaderBar.style.width = loadProgress + '%';
+            if (preloaderText) preloaderText.textContent = 'CARGANDO ' + loadProgress + '%';
+        }, 150);
+
+        function finishLoading() {
+            setTimeout(() => {
+                if (preloader) {
+                    preloader.style.opacity = '0'; // Efecto fade out
+                    setTimeout(() => {
+                        preloader.style.display = 'none';
+                        document.body.style.overflow = ''; // Restaurar scroll
+                        document.body.classList.remove('page-loading');
+                        document.body.classList.add('page-loaded'); // Inicia page fade-in
+                    }, 700);
+                }
+            }, 300); // Pequeña pausa al llegar al 100% antes de desvanecer
         }
 
         // --- SISTEMA DE ESTADÍSTICAS DE VISITAS ---
-        (function() {
+        (function () {
             // Detectar fuente de la visita por parámetro URL
             const urlParams = new URLSearchParams(window.location.search);
             const source = urlParams.get('source') || 'web'; // 'qr', 'nfc', o 'web'
@@ -1190,7 +1237,7 @@
             function getStats() {
                 try {
                     return JSON.parse(localStorage.getItem(STATS_KEY)) || { web: 0, qr: 0, nfc: 0, total: 0 };
-                } catch(e) {
+                } catch (e) {
                     return { web: 0, qr: 0, nfc: 0, total: 0 };
                 }
             }
@@ -1215,7 +1262,7 @@
             }
 
             // Función global para consultar estadísticas desde la consola
-            window.getVisitStats = function() {
+            window.getVisitStats = function () {
                 const currentStats = getStats();
                 console.log('📊 Estadísticas de Visitas:');
                 console.log('   🌐 Web directa:', currentStats.web);
