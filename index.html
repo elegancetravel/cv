@@ -294,13 +294,13 @@
     </style>
 </head>
 
-<body class="bg-black text-white page-loading">
+<body class="bg-black text-white">
     <!-- Pantalla de carga (Logo y Barra) -->
     <div id="preloader"
-        class="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center transition-opacity duration-700">
-        <div class="w-40 h-40 mb-10 animate-pulse relative">
+        class="fixed top-0 left-0 w-full h-[100dvh] z-[9999] bg-black flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="w-48 h-48 mb-10 animate-pulse relative">
             <div
-                class="absolute inset-0 bg-gradient-to-r from-pink-500 to-cyan-500 rounded-full blur-xl opacity-30 animate-pulse">
+                class="absolute inset-0 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-full blur-2xl opacity-60 animate-pulse">
             </div>
             <img src="logo.png" alt="Logo Ivan Apolinar" class="w-full h-full object-contain relative z-10">
         </div>
@@ -313,7 +313,7 @@
             class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-cyan-500 text-sm mt-6 font-mono tracking-widest font-bold">
             CARGANDO 0%</div>
     </div>
-    <div class="relative w-full min-h-screen overflow-hidden">
+    <div id="app-content" class="page-loading relative w-full min-h-screen overflow-hidden">
         <!-- Fondo animado -->
         <div class="fixed inset-0 overflow-hidden z-0">
             <div id="animated-bg" class="absolute inset-0 opacity-40"></div>
@@ -1200,7 +1200,7 @@
 
         const loadingInterval = setInterval(() => {
             // Simulamos avance hasta 100%
-            loadProgress += Math.floor(Math.random() * 15) + 5;
+            loadProgress += Math.floor(Math.random() * 10) + 5;
             if (loadProgress >= 100) {
                 loadProgress = 100;
                 clearInterval(loadingInterval);
@@ -1208,7 +1208,7 @@
             }
             if (preloaderBar) preloaderBar.style.width = loadProgress + '%';
             if (preloaderText) preloaderText.textContent = 'CARGANDO ' + loadProgress + '%';
-        }, 150);
+        }, 30);
 
         function finishLoading() {
             setTimeout(() => {
@@ -1217,11 +1217,15 @@
                     setTimeout(() => {
                         preloader.style.display = 'none';
                         document.body.style.overflow = ''; // Restaurar scroll
-                        document.body.classList.remove('page-loading');
-                        document.body.classList.add('page-loaded'); // Inicia page fade-in
+
+                        const appContent = document.getElementById('app-content');
+                        if (appContent) {
+                            appContent.classList.remove('page-loading');
+                            appContent.classList.add('page-loaded'); // Inicia page fade-in
+                        }
                     }, 700);
                 }
-            }, 300); // Pequeña pausa al llegar al 100% antes de desvanecer
+            }, 200); // Pequeña pausa al llegar al 100% antes de desvanecer
         }
 
         // --- SISTEMA DE ESTADÍSTICAS DE VISITAS ---
