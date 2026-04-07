@@ -322,7 +322,7 @@
                                 </div>
                             </div>
                         </div>
-                        <h1 class="text-5xl md:text-7xl lg:text-9xl font-bold mb-6 gradient-text animate-pulse break-words px-4">
+                        <h1 class="text-4xl sm:text-5xl md:text-7xl lg:text-9xl font-bold mb-6 gradient-text animate-pulse break-words px-2 max-w-[90vw] mx-auto overflow-hidden">
                             ${portfolioData.personal.name}
                         </h1>
                         <p class="text-3xl md:text-4xl text-purple-300 mb-2 font-light">
@@ -335,12 +335,12 @@
                         <p id="bio-text" class="text-xl text-gray-400 mb-12 max-w-2xl mx-auto transition-all duration-1000 opacity-0 translate-y-10">
                             ${portfolioData.personal.bio}
                         </p>
-                        <div class="flex flex-wrap gap-4 justify-center">
-                            <a href="#contact" class="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 rounded-full text-white font-semibold shadow-2xl shadow-pink-500/50 hover:scale-105 transition-transform">
+                        <div class="flex flex-col sm:flex-row w-full max-w-[280px] sm:max-w-none mx-auto gap-4 justify-center items-stretch sm:items-center px-1">
+                            <a href="#contact" class="flex items-center justify-center gap-2 px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 rounded-full text-white font-semibold shadow-xl shadow-pink-500/50 transition-transform hover:scale-105 w-full sm:w-auto shrink-0 touch-manipulation">
                                 📧 Contáctame
                             </a>
                             ${portfolioData.personal.cv_link ? `
-                            <button onclick="showCVModal()" class="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 rounded-full text-white font-semibold shadow-2xl shadow-pink-500/50 hover:scale-105 transition-transform cursor-pointer">
+                            <button onclick="showCVModal()" class="flex items-center justify-center gap-2 px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 rounded-full text-white font-semibold shadow-xl shadow-pink-500/50 transition-transform hover:scale-105 cursor-pointer w-full sm:w-auto shrink-0 touch-manipulation">
                                 🧿 Visualizar CV
                             </button>` : ''}
                         </div>
@@ -704,6 +704,12 @@
 
                 if (!target) {
                     // Limpiar si se toca fuera
+                    document.querySelectorAll('.is-selected').forEach(el => el.classList.remove('is-selected'));
+                    return;
+                }
+
+                // Excepción: Los botones de navegación se ejecutan al instante (un toque)
+                if (target.classList.contains('nav-btn') || target.closest('#nav-container')) {
                     document.querySelectorAll('.is-selected').forEach(el => el.classList.remove('is-selected'));
                     return;
                 }

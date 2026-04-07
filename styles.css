@@ -9,7 +9,7 @@ html,
 body {
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
     position: relative;
     background-color: black;
     overscroll-behavior-x: none;
@@ -20,7 +20,7 @@ body {
 #app-wrapper {
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
     position: relative;
     display: block;
 }
